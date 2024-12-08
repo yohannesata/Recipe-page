@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filtered JSON Table</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            justify-content: center;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        /* Tabs Style */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping */
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px; /* Add space between tabs */
+        }
+
+        .tab {
+            padding: 3px 6px;
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 14px;
+            text-align: center;
+        }
+
+        .tab.active {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        table {
+            display: table-row;
+            margin-left: auto;
+            margin-right: auto;
+            
+        
+            border-collapse: collapse;
+            margin-top: 20px;
+           
+           
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+            margin-left: auto;
+            margin-right: auto;
+
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        td {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .stream-btn {
+            padding: 5px 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .stream-btn:hover {
+            background-color: #0056b3;
+        }
+        #jsonDisplay {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center;    /* Center vertically */
+    min-height: 80vh;       /* Adjust the height of the container */
+}
+    </style>
+</head>
+<body>
+    <h1>Filtered JSON Table</h1>
+    <div class="tabs" id="tabsContainer">Loading tabs...</div>
+    <div id="jsonDisplay">Loading data...</div>
+    <div id="iframeContainer" style="margin-top: 20px;"></div>
+    <div id="popupModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000;">
+        <div style="position: relative; margin: 50px auto; background: #fff; padding: 20px; border-radius: 8px; width: 90%; max-width: 800px;">
+            <iframe id="iframePlayer" width="100%" height="500px" style="border: none;"></iframe>
+            <button style="position: absolute; top: 10px; right: 10px; background: red; color: #fff; border: none; padding: 5px 10px; cursor: pointer;" onclick="closePopup()">Close</button>
+        </div>
+    </div>
+    
+
+
+    <script>
+        const jsonUrl = "./streamed_su.json"; // Path to local JSON file
+
+        // Fetch and display JSON data
+        async function fetchAndDisplayJSON(url) {
+            try {
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const types = [...new Set(data.map(item => item.type))]; // Get unique types
+                createTabs(types);
+                displayJSONData(data, "all"); // Show all data by default
+            } catch (error) {
+                document.getElementById("jsonDisplay").textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Create tabs dynamically
+        function createTabs(types) {
+            const tabsContainer = document.getElementById("tabsContainer");
+            tabsContainer.textContent = ""; // Clear existing content
+
+            // Add "All" tab
+            const allTab = document.createElement("div");
+            allTab.textContent = "All";
+            allTab.className = "tab active";
+            allTab.dataset.type = "all";
+            allTab.addEventListener("click", () => filterTable("all"));
+            tabsContainer.appendChild(allTab);
+
+            // Add a tab for each type
+            types.forEach(type => {
+                const tab = document.createElement("div");
+                tab.textContent = type;
+                tab.className = "tab";
+                tab.dataset.type = type;
+                tab.addEventListener("click", () => filterTable(type));
+                tabsContainer.appendChild(tab);
+            });
+        }
+
+        // Display JSON data in a table
+function displayJSONData(data, filterType) {
+    const displayDiv = document.getElementById("jsonDisplay");
+
+    // Clear existing table
+    displayDiv.textContent = "";
+
+    // Filter data based on the selected type
+    const filteredData = filterType === "all" ? data : data.filter(item => item.type === filterType);
+
+    // If no data for the selected type
+    if (filteredData.length === 0) {
+        displayDiv.textContent = "No data available for the selected type.";
+        return;
+    }
+
+    // Create table
+    const table = document.createElement("table");
+
+    // Create header row
+    const headerRow = document.createElement("tr");
+    const headers = ["Details"]; // Single header for all details
+    headers.forEach(header => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        headerRow.appendChild(th);
+    });
+    table.appendChild(headerRow);
+
+    // Create table rows
+    filteredData.forEach(item => {
+        const row = document.createElement("tr");
+        const td = document.createElement("td");
+
+        // Combine title, date, and stream into one cell
+        td.innerHTML = `
+            <div><strong>Title:</strong> ${item.title}</div>
+            <div><strong>Date:</strong> ${item.date}</div>
+            <button class="stream-btn" onclick="openInIframe('${item.stream}')">Open Stream</button>
+        `;
+
+        row.appendChild(td);
+        table.appendChild(row);
+    });
+
+    // Append table to the displayDiv
+    displayDiv.appendChild(table);
+}
+
+// Function to open stream in a popup
+function openInIframe(url) {
+    // Proxy URL
+    const proxyUrl = `https://betty-three.vercel.app/proxy?url=${encodeURIComponent(url)}`;
+
+    // Set the iframe source to the proxy URL
+    const iframePlayer = document.getElementById("iframePlayer");
+    iframePlayer.src = proxyUrl;
+
+    // Show the popup modal
+    const popupModal = document.getElementById("popupModal");
+    popupModal.style.display = "block";
+}
+
+// Function to close the popup
+function closePopup() {
+    const popupModal = document.getElementById("popupModal");
+    popupModal.style.display = "none";
+
+    // Clear the iframe source to stop playback
+    const iframePlayer = document.getElementById("iframePlayer");
+    iframePlayer.src = "";
+}
+
+
+        // Filter table based on type
+        function filterTable(type) {
+            // Update active tab
+            document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+            document.querySelector(`.tab[data-type="${type}"]`).classList.add("active");
+
+            // Fetch the data again and filter it
+            fetch(jsonUrl)
+                .then(response => response.json())
+                .then(data => displayJSONData(data, type));
+        }
+
+        // Load the local JSON file
+        fetchAndDisplayJSON(jsonUrl);
+    </script>
+</body>
+</html>
