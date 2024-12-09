@@ -248,23 +248,31 @@
         }
 
         function openVideoPlayer(url) {
-            // Check if HLS is supported
-            if (Hls.isSupported()) {
-                const hls = new Hls();
-                hls.loadSource(url);
-                hls.attachMedia(player.el());
-                hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    player.play();
-                });
-            } 
-            // Fallback for browsers with native HLS support
-            else if (player.canPlayType('application/vnd.apple.mpegurl')) {
-                player.src(url);
-                player.play();
+    // Check if HLS is supported
+    if (Hls.isSupported()) {
+        const hls = new Hls({
+            xhrSetup: function (xhr, url) {
+                xhr.setRequestHeader("Authorization", "Bearer YOUR_ACCESS_TOKEN");
             }
+        });
+        hls.loadSource(url);
+        hls.attachMedia(player.el());
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            player.play();
+        });
+    } 
+    // Fallback for browsers with native HLS support
+    else if (player.canPlayType('application/vnd.apple.mpegurl')) {
+        player.src({
+            src: url,
+            type: 'application/vnd.apple.mpegurl',
+            withCredentials: true // For cookies or basic auth
+        });
+        player.play();
+    }
 
-            document.getElementById("popupModal").style.display = "flex";
-        }
+    document.getElementById("popupModal").style.display = "flex";
+}
 
         function closePopup() {
             const popupModal = document.getElementById("popupModal");
