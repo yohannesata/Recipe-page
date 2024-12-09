@@ -1,146 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Filtered JSON Table</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Filtered JSON Table</title>
     <!-- Video.js CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.20.3/video-js.min.css" rel="stylesheet" />
     
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+<style>
+body {
+font-family: Arial, sans-serif;
+margin: 20px;
+display: flex;
+flex-direction: column;
+align-items: center;
+}
 
-        h1 {
-            text-align: center;
-            color: #333;
-        }
+h1 {
+text-align: center;
+color: #333;
+}
 
-        .tabs {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-bottom: 20px;
-            gap: 10px;
-        }
+.tabs {
+display: flex;
+flex-wrap: wrap;
+justify-content: center;
+margin-bottom: 20px;
+gap: 10px;
+}
 
-        .tab {
-            padding: 5px 10px;
-            background-color: #f4f4f4;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
+.tab {
+padding: 5px 10px;
+background-color: #f4f4f4;
+border: 1px solid #ddd;
+border-radius: 5px;
+cursor: pointer;
+font-size: 14px;
+text-align: center;
+transition: all 0.3s ease;
+}
 
-        .tab:hover {
-            background-color: #e0e0e0;
-        }
+.tab:hover {
+background-color: #e0e0e0;
+}
 
-        .tab.active {
-            background-color: #007BFF;
-            color: white;
-        }
+.tab.active {
+background-color: #007BFF;
+color: white;
+}
 
-        table {
-            width: 100%;
-            max-width: 800px;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
+table {
+width: 100%;
+max-width: 800px;
+border-collapse: collapse;
+margin-top: 20px;
+}
 
-        th, td {
-            padding: 12px;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
+th, td {
+padding: 12px;
+text-align: center;
+border: 1px solid #ddd;
+}
 
-        th {
-            background-color: #f4f4f4;
-        }
+th {
+background-color: #f4f4f4;
+}
 
-        td {
-            font-size: 14px;
-            color: #333;
-        }
+td {
+font-size: 14px;
+color: #333;
+}
 
-        .stream-btn {
-            padding: 5px 10px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+.stream-btn {
+padding: 5px 10px;
+background-color: #007BFF;
+color: white;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+transition: background-color 0.3s ease;
+}
 
-        .stream-btn:hover {
-            background-color: #0056b3;
-        }
+.stream-btn:hover {
+background-color: #0056b3;
+}
 
-        #jsonDisplay {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            min-height: 50vh;
-        }
+#jsonDisplay {
+display: flex;
+justify-content: center;
+align-items: center;
+width: 100%;
+min-height: 50vh;
+}
 
-        #popupModal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+#popupModal {
+display: none;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0,0,0,0.8);
+z-index: 1000;
+display: flex;
+justify-content: center;
+align-items: center;
+}
 
-        .modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 800px;
-            position: relative;
-        }
+.modal-content {
+background: white;
+padding: 20px;
+border-radius: 8px;
+width: 90%;
+max-width: 800px;
+position: relative;
+}
 
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: red;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 4px;
-        }
+.close-btn {
+position: absolute;
+top: 10px;
+right: 10px;
+background: red;
+color: white;
+border: none;
+padding: 5px 10px;
+cursor: pointer;
+border-radius: 4px;
+}
 
         .video-js {
             width: 100%;
             height: 500px;
         }
-    </style>
+</style>
 </head>
 <body>
-    <h1>Filtered JSON Table</h1>
-    <div class="tabs" id="tabsContainer">Loading tabs...</div>
-    <div id="jsonDisplay">Loading data...</div>
-    
-    <div id="popupModal">
-        <div class="modal-content">
+<h1>Filtered JSON Table</h1>
+<div class="tabs" id="tabsContainer">Loading tabs...</div>
+<div id="jsonDisplay">Loading data...</div>
+
+<div id="popupModal">
+<div class="modal-content">
+            <iframe id="iframePlayer" width="100%" height="500px" style="border: none;"></iframe>
             <video 
                 id="videoPlayer" 
                 class="video-js vjs-default-skin" 
@@ -152,15 +153,15 @@
                     To view this video please enable JavaScript, and consider upgrading to a web browser that supports HTML5 video.
                 </p>
             </video>
-            <button class="close-btn" onclick="closePopup()">Close</button>
-        </div>
-    </div>
+<button class="close-btn" onclick="closePopup()">Close</button>
+</div>
+</div>
 
     <!-- Video.js and HLS.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.20.3/video.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.0/hls.min.js"></script>
 
-    <script>
+<script>
         // Initialize Video.js player
         const player = videojs('videoPlayer', {
             html5: {
@@ -170,134 +171,92 @@
             }
         });
 
-        const jsonUrl = "https://raw.githubusercontent.com/dtankdempse/streamed-su-sports/refs/heads/main/streamed_su.json";
+const jsonUrl = "https://raw.githubusercontent.com/dtankdempse/streamed-su-sports/refs/heads/main/streamed_su.json";
 
-        // Proxy function to add headers and handle CORS
-        async function proxyFetch(url, headers = {}) {
-            try {
-                // You can replace this with your own proxy service
-                const proxyUrl = `https://recipe-page-seven-gamma.vercel.app/proxy`;
-                
-                const response = await fetch(proxyUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        url: url,
-                        headers: {
-                            ...headers,
-                            'Referer': window.location.origin,
-                            'Origin': window.location.origin
-                        }
-                    })
-                });
+async function fetchAndDisplayJSON(url) {
+try {
+const response = await fetch(url);
+if (!response.ok) {
+throw new Error(`HTTP error! Status: ${response.status}`);
+}
 
-                if (!response.ok) {
-                    throw new Error(`Proxy error: ${response.status}`);
-                }
+const data = await response.json();
+const types = [...new Set(data.map(item => item.type))];
+createTabs(types);
+displayJSONData(data, "all");
+} catch (error) {
+document.getElementById("jsonDisplay").textContent = `Error: ${error.message}`;
+}
+}
 
-                return await response.text();
-            } catch (error) {
-                console.error('Proxy fetch error:', error);
-                throw error;
-            }
-        }
+function createTabs(types) {
+const tabsContainer = document.getElementById("tabsContainer");
+tabsContainer.innerHTML = "";
 
-        async function fetchAndDisplayJSON(url) {
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
+const allTab = document.createElement("div");
+allTab.textContent = "All";
+allTab.className = "tab active";
+allTab.dataset.type = "all";
+allTab.addEventListener("click", () => filterTable("all"));
+tabsContainer.appendChild(allTab);
 
-                const data = await response.json();
-                const types = [...new Set(data.map(item => item.type))];
-                createTabs(types);
-                displayJSONData(data, "all");
-            } catch (error) {
-                document.getElementById("jsonDisplay").textContent = `Error: ${error.message}`;
-            }
-        }
+types.forEach(type => {
+const tab = document.createElement("div");
+tab.textContent = type;
+tab.className = "tab";
+tab.dataset.type = type;
+tab.addEventListener("click", () => filterTable(type));
+tabsContainer.appendChild(tab);
+});
+}
 
-        function createTabs(types) {
-            const tabsContainer = document.getElementById("tabsContainer");
-            tabsContainer.innerHTML = "";
+function displayJSONData(data, filterType) {
+const displayDiv = document.getElementById("jsonDisplay");
+displayDiv.innerHTML = "";
 
-            const allTab = document.createElement("div");
-            allTab.textContent = "All";
-            allTab.className = "tab active";
-            allTab.dataset.type = "all";
-            allTab.addEventListener("click", () => filterTable("all"));
-            tabsContainer.appendChild(allTab);
+const filteredData = filterType === "all" ? data : data.filter(item => item.type === filterType);
 
-            types.forEach(type => {
-                const tab = document.createElement("div");
-                tab.textContent = type;
-                tab.className = "tab";
-                tab.dataset.type = type;
-                tab.addEventListener("click", () => filterTable(type));
-                tabsContainer.appendChild(tab);
-            });
-        }
+if (filteredData.length === 0) {
+displayDiv.textContent = "No data available for the selected type.";
+return;
+}
 
-        function displayJSONData(data, filterType) {
-            const displayDiv = document.getElementById("jsonDisplay");
-            displayDiv.innerHTML = "";
+const table = document.createElement("table");
+const headerRow = document.createElement("tr");
+const headers = ["Details"];
+headers.forEach(header => {
+const th = document.createElement("th");
+th.textContent = header;
+headerRow.appendChild(th);
+});
+table.appendChild(headerRow);
 
-            const filteredData = filterType === "all" ? data : data.filter(item => item.type === filterType);
+filteredData.forEach(item => {
+const row = document.createElement("tr");
+const td = document.createElement("td");
 
-            if (filteredData.length === 0) {
-                displayDiv.textContent = "No data available for the selected type.";
-                return;
-            }
+td.innerHTML = `
+                   <div><strong>Title:</strong> ${item.title}</div>
+                   <div><strong>Date:</strong> ${item.date}</div>
+                    <button class="stream-btn" onclick="openInIframe('${item.stream}')">Open Stream</button>
+                    <button class="stream-btn" onclick="openVideoPlayer('${item.stream}')">Open Stream</button>
+               `;
 
-            const table = document.createElement("table");
-            const headerRow = document.createElement("tr");
-            const headers = ["Details"];
-            headers.forEach(header => {
-                const th = document.createElement("th");
-                th.textContent = header;
-                headerRow.appendChild(th);
-            });
-            table.appendChild(headerRow);
+row.appendChild(td);
+table.appendChild(row);
+});
 
-            filteredData.forEach(item => {
-                const row = document.createElement("tr");
-                const td = document.createElement("td");
+displayDiv.appendChild(table);
+}
 
-                td.innerHTML = `
-                    <div><strong>Title:</strong> ${item.title}</div>
-                    <div><strong>Date:</strong> ${item.date}</div>
-                    <button class="stream-btn" onclick="openVideoPlayer('${item.stream}', ${JSON.stringify(item.headers || {})})">Open Stream</button>
-                `;
-
-                row.appendChild(td);
-                table.appendChild(row);
-            });
-
-            displayDiv.appendChild(table);
-        }
-
-        function openVideoPlayer(url, customHeaders = {}) {
-            // Merge custom headers with default headers
-            const defaultHeaders = {
-                'Referer': https://embedme.top,
-                'Origin': window.location.origin
-            };
-            const headers = { ...defaultHeaders, ...customHeaders };
-
+        function openInIframe(url) {
+            const proxyUrl = `https://recipe-page-seven-gamma.vercel.app/proxy?url=${encodeURIComponent(url)}`;
+            const iframePlayer = document.getElementById("iframePlayer");
+            iframePlayer.src = proxyUrl;
+        function openVideoPlayer(url) {
             // Check if HLS is supported
             if (Hls.isSupported()) {
-                const hls = new Hls({
-                    xhrSetup: (xhr, url) => {
-                        // Apply custom headers to each XHR request
-                        Object.keys(headers).forEach(key => {
-                            xhr.setRequestHeader(key, headers[key]);
-                        });
-                    }
-                });
-
+                const hls = new Hls();
                 hls.loadSource(url);
                 hls.attachMedia(player.el());
                 hls.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -306,33 +265,31 @@
             } 
             // Fallback for browsers with native HLS support
             else if (player.canPlayType('application/vnd.apple.mpegurl')) {
-                player.src({
-                    type: 'application/vnd.apple.mpegurl',
-                    src: url
-                });
+                player.src(url);
                 player.play();
             }
 
-            document.getElementById("popupModal").style.display = "flex";
-        }
+document.getElementById("popupModal").style.display = "flex";
+}
 
-        function closePopup() {
-            const popupModal = document.getElementById("popupModal");
-            popupModal.style.display = "none";
+function closePopup() {
+const popupModal = document.getElementById("popupModal");
+popupModal.style.display = "none";
+            const iframePlayer = document.getElementById("iframePlayer");
+            iframePlayer.src = "";
             player.pause();
             player.src(null);
-        }
+}
 
-        function filterTable(type) {
-            document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
-            document.querySelector(`.tab[data-type="${type}"]`).classList.add("active");
+function filterTable(type) {
+document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+document.querySelector(`.tab[data-type="${type}"]`).classList.add("active");
 
-            fetch(jsonUrl)
-                .then(response => response.json())
-                .then(data => displayJSONData(data, type));
-        }
+fetch(jsonUrl)
+.then(response => response.json())
+.then(data => displayJSONData(data, type));
+}
 
-        fetchAndDisplayJSON(jsonUrl);
-    </script>
+fetchAndDisplayJSON(jsonUrl);
+</script>
 </body>
-</html>
