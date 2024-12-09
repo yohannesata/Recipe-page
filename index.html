@@ -252,7 +252,9 @@
     if (Hls.isSupported()) {
         const hls = new Hls({
             xhrSetup: function (xhr, url) {
-                xhr.setRequestHeader("Authorization", "Bearer YOUR_ACCESS_TOKEN");
+                // Set custom headers
+                xhr.setRequestHeader("Referer", "https://yohan.sw/");
+                xhr.setRequestHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36");
             }
         });
         hls.loadSource(url);
@@ -263,17 +265,12 @@
     } 
     // Fallback for browsers with native HLS support
     else if (player.canPlayType('application/vnd.apple.mpegurl')) {
-        player.src({
-            src: url,
-            type: 'application/vnd.apple.mpegurl',
-            withCredentials: true // For cookies or basic auth
-        });
-        player.play();
+        console.warn("Native HLS does not support custom headers like Referer and User-Agent.");
+        alert("This stream requires a custom Referer and User-Agent, which native HLS does not support.");
     }
 
     document.getElementById("popupModal").style.display = "flex";
 }
-
         function closePopup() {
             const popupModal = document.getElementById("popupModal");
             popupModal.style.display = "none";
