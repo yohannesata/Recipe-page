@@ -172,6 +172,38 @@
 
         const jsonUrl = "https://raw.githubusercontent.com/dtankdempse/streamed-su-sports/refs/heads/main/streamed_su.json";
 
+        // Proxy function to add headers and handle CORS
+        async function proxyFetch(url, headers = {}) {
+            try {
+                // You can replace this with your own proxy service
+                const proxyUrl = `https://recipe-page-seven-gamma.vercel.app/proxy`;
+                
+                const response = await fetch(proxyUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        url: url,
+                        headers: {
+                            ...headers,
+                            'Referer': window.location.origin,
+                            'Origin': window.location.origin
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Proxy error: ${response.status}`);
+                }
+
+                return await response.text();
+            } catch (error) {
+                console.error('Proxy fetch error:', error);
+                throw error;
+            }
+        }
+
         async function fetchAndDisplayJSON(url) {
             try {
                 const response = await fetch(url);
@@ -237,7 +269,7 @@
                 td.innerHTML = `
                     <div><strong>Title:</strong> ${item.title}</div>
                     <div><strong>Date:</strong> ${item.date}</div>
-                    <button class="stream-btn" onclick="openVideoPlayer('${item.stream}')">Open Stream</button>
+                    <button class="stream-btn" onclick="openVideoPlayer('${item.stream}', ${JSON.stringify(item.headers || {})})">Open Stream</button>
                 `;
 
                 row.appendChild(td);
@@ -247,10 +279,25 @@
             displayDiv.appendChild(table);
         }
 
-        function openVideoPlayer(url) {
+        function openVideoPlayer(url, customHeaders = {}) {
+            // Merge custom headers with default headers
+            const defaultHeaders = {
+                'Referer': https://embedme.top,
+                'Origin': window.location.origin
+            };
+            const headers = { ...defaultHeaders, ...customHeaders };
+
             // Check if HLS is supported
             if (Hls.isSupported()) {
-                const hls = new Hls();
+                const hls = new Hls({
+                    xhrSetup: (xhr, url) => {
+                        // Apply custom headers to each XHR request
+                        Object.keys(headers).forEach(key => {
+                            xhr.setRequestHeader(key, headers[key]);
+                        });
+                    }
+                });
+
                 hls.loadSource(url);
                 hls.attachMedia(player.el());
                 hls.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -259,7 +306,10 @@
             } 
             // Fallback for browsers with native HLS support
             else if (player.canPlayType('application/vnd.apple.mpegurl')) {
-                player.src(url);
+                player.src({
+                    type: 'application/vnd.apple.mpegurl',
+                    src: url
+                });
                 player.play();
             }
 
